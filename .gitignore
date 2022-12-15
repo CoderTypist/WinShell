@@ -1,2 +1,6 @@
-.git/
-.idea/
+# ignore in root directory
+/.git/
+/.idea/
+
+# ignore anywhere
+__pycache__
