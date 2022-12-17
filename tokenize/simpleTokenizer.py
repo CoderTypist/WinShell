@@ -53,7 +53,6 @@ class SimpleTokenizer(ABC):
                     break
             # substring did not match with any pattern (i.e., unexpected characters or sequence of characters)
             else:
-                raise Exception(
-                    f'Error: class CommandTokenizer: tokenize(): Unable to tokenize: Invalid character(s): {text[index::]}')
+                raise Exception(f'Error: class CommandTokenizer: tokenize(): Unable to tokenize: Invalid character(s): {text[index::]}')
 
         return tokens

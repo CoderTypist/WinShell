@@ -1,8 +1,12 @@
+import shlex
+import subprocess
+from system import Shell
 from tokenize import CommandTokenizer
 
 
 def main():
     example_command_tokenizer()
+    example_shell()
 
 
 def example_command_tokenizer():
@@ -16,6 +20,11 @@ def example_command_tokenizer():
             print(f'- {t}')
     except Exception as e:
         print(e)
+
+
+def example_shell():
+
+    print(Shell.run(shlex))
 
 
 if __name__ == '__main__':
