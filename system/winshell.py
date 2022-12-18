@@ -1,8 +1,8 @@
-from abc import ABC
 from enum import Enum
 import platform
 import subprocess
 from tokenize import CommandTokenizer
+from typing import Union
 
 
 class Platform(Enum):
@@ -13,77 +13,90 @@ class Platform(Enum):
 class Shell(Enum):
     CMD = 0
     POWERSHELL = 1
-    SH = 2
-    BASH = 3
+    BASH = 2
 
 
-# TODO: Change pwd? (e.g., def cd ...)
-# TODO: Detect error values (would require changing return type from string to something else)
 # Simply makes sure that commands are run in the correct shell
-# Assumes CMD, PowerShell, sh and Bash are all available
+# Assumes CMD, PowerShell, and Bash are all available
 # Assumes CMD is the default Windows Shell
 # Assumes Bash is the default Linux Shell
 class WinShell:
 
     command_tokenizer = CommandTokenizer()
 
-    def __init__(self, shell: Shell, encoding, pwd: str = None):
+    def __init__(self, shell: Shell):
         self.shell: Shell = shell
-        self.encoding: str = encoding
 
     def run(self, command: str, **kwargs) -> str:
-        return WinShell._run(self.shell, command, self.encoding, **kwargs)
+        return WinShell._run(self.shell, command, **kwargs)
 
     @classmethod
-    def _run(cls, shell: Shell, command: str, encoding, **kwargs):
+    def _run(cls, shell: Shell, command: str, **kwargs) -> Union[str, bytes]:
 
-        subprocessShellParam = True
+        subprocess_shell_param = None
+        plat = WinShell.platform()
 
-        if shell == Shell.CMD:
-            # set subprocessShellParam (True or False) based on platform
-            # set command, if any, to select shell
-        elif shell == Shell.POWERSHELL:
-            # set subprocessShellParam (True or False) based on platform
-            # set command, if any, to select shell
-        elif shell == Shell.SH:
-            # set subprocessShellParam (True or False) based on platform
-            # set command, if any, to select shell
-        elif shell == Shell.BASH:
-            # set subprocessShellParam (True or False) based on platform
-            # set command, if any, to select shell
+        if plat == Platform.WINDOWS:
+            subprocess_shell_param = True
+            if shell == Shell.CMD:
+                pass
+            elif shell == Shell.POWERSHELL:
+                command = 'powershell;' + command
+            elif shell == Shell.BASH:
+                command = 'wsl.exe -- ' + command
+            else:
+                raise Exception(f'Error: class WinShell: _run(): Invalid Shell: {shell}')
+
+        elif plat == Platform.WSL:
+            subprocess_shell_param = False
+            if shell == Shell.CMD:
+                pass
+            elif shell == Shell.POWERSHELL:
+                pass
+            elif shell == Shell.BASH:
+                pass
+            else:
+                raise Exception(f'Error: class WinShell: _run(): Invalid Shell: {shell}')
+
         else:
-            raise Exception(f'Error: class WinShell: run(): Invalid Shell: {shell.name}')
+            raise Exception(f'Error: class WinShell: _run(): Invalid Platform: {plat}')
 
-        tokens = Shell.command_tokenizer.tokenize(command)
+        tokens = WinShell.command_tokenizer.tokenize(command)
+
         kwargs['stdout'] = subprocess.PIPE
-        kwargs['shell'] = subprocessShellParam
-        return subprocess.run(tokens, **kwargs).stdout.decode(encoding)
+        if 'shell' not in kwargs:
+            kwargs['shell'] = subprocess_shell_param
 
-
-    @classmethod
-    def cmd(cls, command: str, encoding='utf-8', **kwargs) -> str:
-        return WinShell._run(Shell.CMD, command, encoding, **kwargs)
+        return subprocess.run(tokens, **kwargs).stdout.decode('utf-8')
 
     @classmethod
-    def powershell(cls, command: str, encoding='utf-8', **kwargs) -> str:
-        return WinShell._run(Shell.POWERSHELL, command, encoding, **kwargs)
+    def cmd(cls, command: str, **kwargs) -> str:
+        return WinShell._run(Shell.CMD, command, **kwargs)
 
     @classmethod
-    def sh(cls, command: str, encoding='utf-8', **kwargs) -> str:
-        return WinShell._run(Shell.SH, command, encoding, **kwargs)
+    def powershell(cls, command: str, **kwargs) -> str:
+        return WinShell._run(Shell.POWERSHELL, command, **kwargs)
 
     @classmethod
-    def bash(cls, command: str, encoding='utf-8', **kwargs) -> str:
-        return WinShell._run(Shell.BASH, command, encoding, **kwargs)
+    def bash(cls, command: str, **kwargs) -> str:
+        return WinShell._run(Shell.BASH, command, **kwargs)
 
     @classmethod
     def platform(cls) -> Platform:
-        pass
+        plat = platform.platform()
+        if 'Windows' in plat:
+            return Platform.WINDOWS
+        elif 'WSL' in plat:
+            return Platform.WSL
+        else:
+            raise Exception('Error: class WinShell: platform(): Unexpected platform: {plat}')
 
     @classmethod
-    def encoding(cls, platform=None):
-        if platform:
-            pass
+    def platform_encoding(cls, platform: Platform=None) -> str:
+        plat = platform if platform else WinShell.platform()
+        if plat == Platform.WINDOWS:
+            return 'utf-16'
+        elif plat == Platform.WSL:
+            return 'utf-8'
         else:
-            pass
-
+            raise Exception('Error: class WinShell: encoding(): Unexpected platform: {plat}')

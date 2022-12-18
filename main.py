@@ -1,11 +1,11 @@
-import shlex
-import subprocess
 from system import Shell
+from system import WinShell
 from tokenize import CommandTokenizer
 
 
 def main():
-    example_command_tokenizer()
+
+    # example_command_tokenizer()
     example_shell()
 
 
@@ -24,7 +24,30 @@ def example_command_tokenizer():
 
 def example_shell():
 
-    print(Shell.run(shlex))
+    def header(title):
+        print('---------------------------------------------------------')
+        print(f'{title}:')
+
+    header('CMD - class method')
+    print(WinShell.cmd('dir'))
+
+    header('CMD - object')
+    shell = WinShell(Shell.CMD)
+    print(shell.run('dir'))
+
+    header('POWERSHELL - class method')
+    print(WinShell.powershell('dir'))
+
+    header('POWERSHELL - object')
+    shell = WinShell(Shell.POWERSHELL)
+    print(shell.run('dir'))
+
+    header('BASH - class method')
+    print(WinShell.bash('ls'))
+
+    header('BASH - object')
+    shell = WinShell(Shell.BASH)
+    print(shell.run('ls'))
 
 
 if __name__ == '__main__':
