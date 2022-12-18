@@ -90,13 +90,3 @@ class WinShell:
             return Platform.WSL
         else:
             raise Exception('Error: class WinShell: platform(): Unexpected platform: {plat}')
-
-    @classmethod
-    def platform_encoding(cls, platform: Platform=None) -> str:
-        plat = platform if platform else WinShell.platform()
-        if plat == Platform.WINDOWS:
-            return 'utf-16'
-        elif plat == Platform.WSL:
-            return 'utf-8'
-        else:
-            raise Exception('Error: class WinShell: encoding(): Unexpected platform: {plat}')
