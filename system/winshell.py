@@ -50,9 +50,9 @@ class WinShell:
         elif plat == Platform.WSL:
             subprocess_shell_param = False
             if shell == Shell.CMD:
-                pass
+                command = 'cmd.exe /c ' + command
             elif shell == Shell.POWERSHELL:
-                pass
+                command = 'powershell.exe -c ' + command
             elif shell == Shell.BASH:
                 pass
             else:
