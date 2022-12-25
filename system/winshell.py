@@ -3,7 +3,6 @@ import platform
 import re
 import subprocess
 from tokenize import CommandTokenizer
-from typing import Union
 
 
 class Platform(Enum):
@@ -28,16 +27,6 @@ class WinShell:
     def __init__(self, shell: Shell):
         self.shell: Shell = shell
 
-    # *----------------------------*
-    # | TESTED FOR MULT. COMMANDS  |
-    # *----------------------------*
-    # | SHELL      | Windows | WSL |
-    # *----------------------------*
-    # | cmd        | Yes     | No  |
-    # | PowerShell | Yes     | No  |
-    # | Bash       | Yes     | No  |
-    # *----------------------------*
-
     @classmethod
     def _run_raw(cls, shell: Shell, command: str, **kwargs) -> str:
 
@@ -58,6 +47,7 @@ class WinShell:
         elif plat == Platform.WSL:
             subprocess_shell_param = False
             if shell == Shell.CMD:
+                command = re.sub('/', '\\/', command)
                 command = 'cmd.exe /c ' + command
             elif shell == Shell.POWERSHELL:
                 command = 'powershell.exe -c ' + command
@@ -103,22 +93,20 @@ class WinShell:
     def get_powershell_username(cls):
         pass
 
-    '''
     @classmethod
     def get_bash_username(cls):
         pass
-    '''
 
     @classmethod
-    def cmd(cls, command: str, **kwargs) -> str:
+    def cmd_raw(cls, command: str, **kwargs) -> str:
         return WinShell._run_raw(Shell.CMD, command, **kwargs)
 
     @classmethod
-    def powershell(cls, command: str, **kwargs) -> str:
+    def powershell_raw(cls, command: str, **kwargs) -> str:
         return WinShell._run_raw(Shell.POWERSHELL, command, **kwargs)
 
     @classmethod
-    def bash(cls, command: str, **kwargs) -> str:
+    def bash_raw(cls, command: str, **kwargs) -> str:
         return WinShell._run_raw(Shell.BASH, command, **kwargs)
 
     @classmethod

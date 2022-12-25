@@ -1,18 +1,15 @@
-from system import Shell
 from system import WinShell
 from tokenize import CommandTokenizer
-import os
 
 
-# TODO: 01: Test for multiple shell commands on Platform.WSL
-# TODO: 02: Username functions
-# TODO: 03: _run
+# TODO: 01: Username functions
+# TODO: 02: _run
+
 
 def main():
 
     example_command_tokenizer()
-    # example_username()
-    example_shell()
+    example_shell_raw()
 
 
 
@@ -48,17 +45,16 @@ def example_username():
 '''
 
 
-def example_shell():
+def example_shell_raw():
 
-    header('CMD - class method')
-    print(WinShell.cmd('dir /ah & echo %cd% & dir /ah'))
+    header('_cmd_raw()')
+    print(WinShell.cmd_raw('dir /ah & echo %cd% & dir /ah'))
 
-    header('POWERSHELL - class method')
-    print(WinShell.powershell('dir -Force ./ ; Get-Location ; dir -Force ./'))
+    header('_powershell_raw()')
+    print(WinShell.powershell_raw('dir -Force ./ ; Get-Location ; dir -Force ./'))
 
-    header('BASH - class method')
-    # print(WinShell.bash('ls; pwd; ls'))
-    print(WinShell.bash('ls -la ./ ; pwd ; ls -la ./'))
+    header('_bash_raw()')
+    print(WinShell.bash_raw('ls -la ./ ; pwd ; ls -la ./'))
 
 
 if __name__ == '__main__':
