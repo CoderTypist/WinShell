@@ -2,15 +2,14 @@ from system import WinShell
 from tokenize import CommandTokenizer
 
 
-# TODO: 01: Username functions
-# TODO: 02: _run
+# TODO: 01: _run
 
 
 def main():
 
     example_command_tokenizer()
     example_shell_raw()
-
+    example_username()
 
 
 def header(title):
@@ -31,20 +30,6 @@ def example_command_tokenizer():
         print(e)
 
 
-'''
-def example_username():
-
-    header('CMD - username')
-    print(WinShell.get_cmd_username())
-
-    header('POWERSHELL - username')
-    print(WinShell.get_powershell_username())
-
-    header('BASH - username')
-    print(WinShell.get_powershell_username())
-'''
-
-
 def example_shell_raw():
 
     header('_cmd_raw()')
@@ -55,6 +40,28 @@ def example_shell_raw():
 
     header('_bash_raw()')
     print(WinShell.bash_raw('ls -la ./ ; pwd ; ls -la ./'))
+
+
+def example_username():
+
+    header('CMD - username')
+    uname = WinShell.get_cmd_username()
+    print('####################')
+    print(f'X-{uname}-X')
+    print('####################')
+
+    header('POWERSHELL - username')
+    uname = WinShell.get_powershell_username()
+    print('####################')
+    print(f'X-{uname}-X')
+    print('####################')
+
+    print(WinShell.bash_raw('uname -a'))
+    header('POWERSHELL - username')
+    uname = WinShell.get_bash_username()
+    print('####################')
+    print(f'X-{uname}-X')
+    print('####################')
 
 
 if __name__ == '__main__':

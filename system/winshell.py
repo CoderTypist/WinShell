@@ -52,7 +52,7 @@ class WinShell:
             elif shell == Shell.POWERSHELL:
                 command = 'powershell.exe -c ' + command
             elif shell == Shell.BASH:
-                pass
+                command = 'wsl.exe -- ' + command
             else:
                 raise Exception(f'Error: class WinShell: _run(): Invalid Shell: {shell}')
 
@@ -79,23 +79,15 @@ class WinShell:
 
     @classmethod
     def get_cmd_username(cls):
-        plat = WinShell.platform()
-        out = WinShell._run_raw(Shell.CMD, 'echo %USERNAME%')
-        if plat == Shell.WINDOWS:
-            pass
-        elif plat == Shell.WSL:
-            pass
-        else:
-            raise Exception('Error: class WinShell: get_cmd_username(): Unexpected platform: {plat}')
-        return out
+        return WinShell._run_raw(Shell.CMD, 'echo %USERNAME%').strip()
 
     @classmethod
     def get_powershell_username(cls):
-        pass
+        return WinShell._run_raw(Shell.POWERSHELL, 'echo $env:username').strip()
 
     @classmethod
     def get_bash_username(cls):
-        pass
+        return WinShell._run_raw(Shell.BASH, 'echo $USER').strip()
 
     @classmethod
     def cmd_raw(cls, command: str, **kwargs) -> str:
