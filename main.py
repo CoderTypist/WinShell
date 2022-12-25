@@ -1,4 +1,4 @@
-from system import WinShell
+import system.winshell as winshell
 from tokenize import CommandTokenizer
 
 
@@ -33,32 +33,32 @@ def example_command_tokenizer():
 def example_shell_raw():
 
     header('_cmd_raw()')
-    print(WinShell.cmd_raw('dir /ah & echo %cd% & dir /ah'))
+    print(winshell.cmd_raw('dir /ah & echo %cd% & dir /ah'))
 
     header('_powershell_raw()')
-    print(WinShell.powershell_raw('dir -Force ./ ; Get-Location ; dir -Force ./'))
+    print(winshell.powershell_raw('dir -Force ./ ; Get-Location ; dir -Force ./'))
 
     header('_bash_raw()')
-    print(WinShell.bash_raw('ls -la ./ ; pwd ; ls -la ./'))
+    print(winshell.bash_raw('ls -la ./ ; pwd ; ls -la ./'))
 
 
 def example_username():
 
     header('CMD - username')
-    uname = WinShell.get_cmd_username()
+    uname = winshell.get_cmd_username()
     print('####################')
     print(f'X-{uname}-X')
     print('####################')
 
     header('POWERSHELL - username')
-    uname = WinShell.get_powershell_username()
+    uname = winshell.get_powershell_username()
     print('####################')
     print(f'X-{uname}-X')
     print('####################')
 
-    print(WinShell.bash_raw('uname -a'))
+    print(winshell.bash_raw('uname -a'))
     header('POWERSHELL - username')
-    uname = WinShell.get_bash_username()
+    uname = winshell.get_bash_username()
     print('####################')
     print(f'X-{uname}-X')
     print('####################')
