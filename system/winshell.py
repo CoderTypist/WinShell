@@ -1,5 +1,6 @@
 from enum import Enum
 import platform
+import re
 import subprocess
 from tokenize import CommandTokenizer
 from typing import Union
@@ -27,11 +28,18 @@ class WinShell:
     def __init__(self, shell: Shell):
         self.shell: Shell = shell
 
-    def run(self, command: str, **kwargs) -> str:
-        return WinShell._run(self.shell, command, **kwargs)
+    # *----------------------------*
+    # | TESTED FOR MULT. COMMANDS  |
+    # *----------------------------*
+    # | SHELL      | Windows | WSL |
+    # *----------------------------*
+    # | cmd        | Yes     | No  |
+    # | PowerShell | Yes     | No  |
+    # | Bash       | Yes     | No  |
+    # *----------------------------*
 
     @classmethod
-    def _run(cls, shell: Shell, command: str, **kwargs) -> Union[str, bytes]:
+    def _run_raw(cls, shell: Shell, command: str, **kwargs) -> str:
 
         subprocess_shell_param = None
         plat = WinShell.platform()
@@ -39,9 +47,9 @@ class WinShell:
         if plat == Platform.WINDOWS:
             subprocess_shell_param = True
             if shell == Shell.CMD:
-                pass
+                command = re.sub('/', '\\/', command)
             elif shell == Shell.POWERSHELL:
-                command = 'powershell;' + command
+                command = 'powershell ' + command
             elif shell == Shell.BASH:
                 command = 'wsl.exe -- ' + command
             else:
@@ -67,19 +75,51 @@ class WinShell:
         if 'shell' not in kwargs:
             kwargs['shell'] = subprocess_shell_param
 
+        print(f'command: {command}')
+        print(f'tokens: {tokens}')
         return subprocess.run(tokens, **kwargs).stdout.decode('utf-8')
 
     @classmethod
+    def _run(cls, shell: Shell, command: str) -> str:
+        # COMPLETE THE USERNAME FUNCTIONS FIRST
+        # first go to the cwd
+        # - may require finding the shell username
+        # - may require converting a WSL to path to a Window path and vice-versa
+        pass
+
+    @classmethod
+    def get_cmd_username(cls):
+        plat = WinShell.platform()
+        out = WinShell._run_raw(Shell.CMD, 'echo %USERNAME%')
+        if plat == Shell.WINDOWS:
+            pass
+        elif plat == Shell.WSL:
+            pass
+        else:
+            raise Exception('Error: class WinShell: get_cmd_username(): Unexpected platform: {plat}')
+        return out
+
+    @classmethod
+    def get_powershell_username(cls):
+        pass
+
+    '''
+    @classmethod
+    def get_bash_username(cls):
+        pass
+    '''
+
+    @classmethod
     def cmd(cls, command: str, **kwargs) -> str:
-        return WinShell._run(Shell.CMD, command, **kwargs)
+        return WinShell._run_raw(Shell.CMD, command, **kwargs)
 
     @classmethod
     def powershell(cls, command: str, **kwargs) -> str:
-        return WinShell._run(Shell.POWERSHELL, command, **kwargs)
+        return WinShell._run_raw(Shell.POWERSHELL, command, **kwargs)
 
     @classmethod
     def bash(cls, command: str, **kwargs) -> str:
-        return WinShell._run(Shell.BASH, command, **kwargs)
+        return WinShell._run_raw(Shell.BASH, command, **kwargs)
 
     @classmethod
     def platform(cls) -> Platform:
